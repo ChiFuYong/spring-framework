@@ -137,9 +137,28 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-
+		/* 1.父类构造方法，初始化一些默认值，初始化的值如下：
+		 * 	AbstractXmlApplicationContext:
+		 * 		validating=true
+		 * 	AbstractApplicationContext:
+		 * 		logger、
+		 * 		id = "org.springframework.context.support.ClassPathXmlApplicationContext@5ba23b66"
+		 * 		displayName = "org.springframework.context.support.ClassPathXmlApplicationContext@5ba23b66"
+		 * 		beanFactoryPostProcessors
+		 * 		active="false"
+		 * 		closed="false"
+		 * 		startupShutdownMonitor = new Object() 用于 refresh 和 destroy
+		 * 		resourcePatternResolver
+		 * 		applicationListeners
+		 *  DefaultResourceLoader:
+		 * 		classLoader
+		 * 		protocolResolvers
+		 * 		resourceCaches
+		 **/
 		super(parent);
+		//2.获取 configLocations、environment
 		setConfigLocations(configLocations);
+		//3.刷新 context
 		if (refresh) {
 			refresh();
 		}
