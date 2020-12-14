@@ -156,7 +156,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 		 * 		resourceCaches
 		 **/
 		super(parent);
-		//2.获取 configLocations、environment
+		//2.处理外部引入的配置文件，会创建 StandardEnvironment 对象，并解析配置文件中的 Placeholders(占位符)
 		setConfigLocations(configLocations);
 		//3.刷新 context
 		if (refresh) {

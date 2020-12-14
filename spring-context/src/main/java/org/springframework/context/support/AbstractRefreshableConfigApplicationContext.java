@@ -78,7 +78,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
-				//获取 environment（StandardEnvironment）、解析 configLocations
+				//创建 StandardEnvironment 对象、解析配置文件中的 Placeholder(占位符)
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
 		}
@@ -123,6 +123,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
+		//new 一个 StandardEnvironment 对象，StandardEnvironment 会触发父类AbstractEnvironment构造方法，
+		// AbstractEnvironment构造方法又调用了 customizePropertySources(),实现在StandardEnvironment子类，所以就有了 propertySources 的初始化赋值。
 		return getEnvironment().resolveRequiredPlaceholders(path);
 	}
 

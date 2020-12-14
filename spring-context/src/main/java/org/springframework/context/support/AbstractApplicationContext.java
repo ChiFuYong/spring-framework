@@ -516,48 +516,50 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// 刷新前的准备，初始化一些上下文的值
+			//1.刷新前的准备，初始化设置一些值。
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
+			//2.创建 BeanFactory，并解析获取配置中的 beanDefinition 信息，放入 beanDefinitionMap
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
+			//3.设置一些 beanFactory 属性值。
+			// 注：源码里有类似 prepare 的方法，里面都是设置一些值的，自己写代码可借鉴命名方式。
 			prepareBeanFactory(beanFactory);
 
 			try {
-				// Allows post-processing of the bean factory in context subclasses.
+				//4.空方法，留给子类做扩展
 				postProcessBeanFactory(beanFactory);
 
-				// Invoke factory processors registered as beans in the context.
+				//5.实例化所有已经实现了 BeanFactoryPostProcess 接口 Bean，并调用 Spring 提供的扩展方法
+				//注：SpringBoot 自动装配就是在此实现的
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
+				//6.实例化并注册所有的实现了 BeanPostProcessor 接口 Bean，注：这里还未执行扩展的方法，只是做了实例化和注册
 				registerBeanPostProcessors(beanFactory);
 
-				// Initialize message source for this context.
+				//7.完成国际化功能i18n（国际化），不是特别重要，可忽略
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
+				//8.初始化事件广播器，可忽略
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
+				//9.空方法，留给子类扩展.
+				// 注：在 SpringBoot 中内嵌的 Tomcat，就是通过这里实现启动的。
 				onRefresh();
 
-				// Check for listener beans and register them.
+				//10.注册监听器，可忽略
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
+				/**
+				 * 11.核心方法：实例化非懒加载的单例对象
+				 * */
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
 				finishRefresh();
-			}
-
-			catch (BeansException ex) {
-				if (logger.isWarnEnabled()) {
-					logger.warn("Exception encountered during context initialization - " +
-							"cancelling refresh attempt: " + ex);
+			} catch (BeansException ex) {
+				if (logger.isWarnEnabled())  {
+					logger.warn("Exception encountered during context initialization - " + "cancelling refresh attempt: " + ex);
 				}
 
 				// Destroy already created singletons to avoid dangling resources.
@@ -568,9 +570,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Propagate exception to caller.
 				throw ex;
-			}
-
-			finally {
+			} finally {
 				// Reset common introspection caches in Spring's core, since we
 				// might not ever need metadata for singleton beans anymore...
 				resetCommonCaches();
@@ -583,7 +583,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * active flag as well as performing any initialization of property sources.
 	 */
 	protected void prepareRefresh() {
-		// Switch to active.
 		this.startupDate = System.currentTimeMillis();
 		this.closed.set(false);
 		this.active.set(true);
@@ -597,11 +596,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 
-		// Initialize any placeholder property sources in the context environment.
+		// 没有具体实现，留给子类扩展
 		initPropertySources();
 
-		// Validate that all properties marked as required are resolvable:
-		// see ConfigurablePropertyResolver#setRequiredProperties
+		//校验 requiredProperties 是否未配置，未配置抛 MissingRequiredPropertiesException 运行时异常。
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...

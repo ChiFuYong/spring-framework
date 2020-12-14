@@ -7,4 +7,14 @@
     <!-- 开启注解扫描 -->
     <context:component-scan base-package="cn.chifuyong"></context:component-scan>
 
+	<!--测试 BeanDefinitionRegisterPostProcessor-->
+	<bean class="cn.chifuyong.postprocessors.BeanDefinitionRegisterPostProcessorTest"></bean>
+
+	<!--测试 BeanFactoryPostProcessor，执行顺序按从上往下顺序-->
+	<bean class="cn.chifuyong.postprocessors.BeanFactoryPostProcessorTest2"></bean>
+	<bean class="cn.chifuyong.postprocessors.BeanFactoryPostProcessorTest1"></bean>
+
+	<!--测试 FactoryBean-->
+	<bean id="env" class="cn.chifuyong.factorybean.FactoryBeanTest"></bean>
+
 </beans>
